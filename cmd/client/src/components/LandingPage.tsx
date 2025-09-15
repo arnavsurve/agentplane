@@ -260,7 +260,7 @@ export function LandingPage() {
               Plug and play infrastructure for your AI agents.
             </h1>
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-              The easiest way to deploy production-ready MCP agents.
+              The easiest way to deploy and scale MCP agents.
             </p>
             <Button
               size="lg"
@@ -280,7 +280,7 @@ export function LandingPage() {
               <div>
                 <h3 className="text-lg font-medium mb-3">MCP Integration</h3>
                 <p className="text-muted-foreground">
-                  Connect any MCP server without writing protocol code
+                  Connect any MCP server without writing code
                 </p>
               </div>
               <div>
