@@ -1,13 +1,13 @@
 ---
 title: Streaming API
-description: Real-time streaming responses from your AI agents using Server-Sent Events
+description: Live responses via Server‑Sent Events (SSE).
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
 # Streaming API
 
-The Streaming API provides real-time streaming responses from your AI agents using Server-Sent Events (SSE). Get immediate feedback as the agent generates its response, perfect for interactive applications.
+Live responses as they’re generated. Great for chat UIs and progress.
 
 ## Endpoint
 
@@ -27,7 +27,28 @@ Authorization: Bearer apk_your_api_key_here
 **Agent-Specific Keys** - Each API key only works with the specific agent it was created for. See [Authentication](/docs/authentication) for complete details.
 </Callout>
 
-## Request Format
+## Try it now (30 seconds)
+
+```bash
+export GLYFS_AGENT_ID="REPLACE_ME"
+export GLYFS_API_KEY="apk_REPLACE_ME"
+
+curl -N "https://glyfs.dev/api/agents/$GLYFS_AGENT_ID/invoke/stream" \
+  -H "Authorization: Bearer $GLYFS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Count to 3"}'
+```
+
+You’ll see something like:
+```
+data: {"type":"metadata","data":{"agent_id":"..."}}
+data: {"type":"token","content":"One"}
+data: {"type":"token","content":" … "}
+data: {"type":"token","content":"Two"}
+data: {"type":"done","data":{"response":"One … Two … Three."}}
+```
+
+## Request
 
 ### Headers
 - `Content-Type: application/json`
@@ -55,7 +76,7 @@ Authorization: Bearer apk_your_api_key_here
 **Identical Request Format** - The request format is identical to the [Invoke API](/docs/api/invoke). Only the response format differs.
 </Callout>
 
-## Response Format
+## Response
 
 The response is a stream of Server-Sent Events (SSE). Each event is a JSON object with the following structure:
 
@@ -94,23 +115,41 @@ Individual text chunks as the response is generated.
 ```
 
 ### `tool_event`
-Tool execution events when the agent uses tools. The actual structure depends on the specific tool being used and MCP server implementation.
+Emitted when tools run. Shape matches the server’s ToolCallEvent:
 
 ```json
-{
-  "type": "tool_event",
-  "content": "",
-  "data": {
-    "tool_name": "example_tool",
-    "status": "executing",
-    "result": "...",
-    "error": null
-  }
-}
+// Start
+{ "type": "tool_event", "data": { 
+  "type": "tool_start", 
+  "call_id": "call_123", 
+  "tool_name": "web_search", 
+  "arguments": { "query": "latest AI" } 
+} }
+
+// Result
+{ "type": "tool_event", "data": { 
+  "type": "tool_result", 
+  "call_id": "call_123", 
+  "tool_name": "web_search", 
+  "result": "…string payload…", 
+  "duration_ms": 312 
+} }
+
+// Error
+{ "type": "tool_event", "data": { 
+  "type": "tool_error", 
+  "call_id": "call_123", 
+  "tool_name": "web_search", 
+  "error": "timeout", 
+  "duration_ms": 30000 
+} }
+
+// End of tool batch
+{ "type": "tool_event", "data": { "type": "tool_batch_complete" } }
 ```
 
 <Callout type="note">
-**Tool Event Variability** - Tool event structure varies based on the MCP server and tool implementation. See [Tools & MCP](/docs/tools/) documentation for specific tool event formats.
+Tool result strings can be long. In streaming, very large results may be truncated for transport safety.
 </Callout>
 
 ### `done`

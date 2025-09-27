@@ -1,92 +1,88 @@
 ---
-title: MCP Integration
-description: Detailed information about Model Context Protocol (MCP) integration with Glyfs agents
+title: MCP Tools
+description: Connect HTTP/SSE tools to your agent.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-# MCP Integration
+# MCP Tools
 
-Detailed information about Model Context Protocol (MCP) integration with Glyfs agents.
+Add tools so your agent can call APIs, fetch data, read files.
 
 ## What is MCP?
 
 The Model Context Protocol (MCP) is an open protocol that enables secure, controlled integration between AI systems and external tools, data sources, and services.
 
-## How MCP Works with Glyfs
+## How it works
 
-Glyfs agents can be configured to work with MCP servers, which provide:
+Your agent connects to MCP servers (transport: `http` or `sse`). Those servers expose tools. When the model calls a tool, Glyfs executes it and streams events.
 
-1. **Tool Definitions**: Available functions and their parameters
-2. **Execution Environment**: Secure sandboxed execution
-3. **State Management**: Persistent context between tool calls
-4. **Error Handling**: Robust error reporting and recovery
+Supported transports: `http`, `sse` (stdio/websocket not supported).
 
-## Configuration
+## Add a server
 
-MCP servers are configured at the agent level through the Glyfs web interface:
+1) Agent → Tools tab → “Add MCP Server”  
+2) Choose transport:
+- `http`: REST-style endpoint (e.g. `https://api.example.com/mcp`)
+- `sse`: Event stream endpoint (e.g. `https://api.example.com/events`)
 
-1. Navigate to your agent settings
-2. Go to the "Tools" or "MCP" section
-3. Add MCP server configurations
-4. Test connectivity and permissions
+3) Optional
+- Headers (e.g. `Authorization: Bearer ...`)  
+- Mark sensitive fields (URL or specific headers) to store them encrypted.
 
-## Tool Event Types
+4) Save → “Test Connection” → Enable for this agent.
 
-When MCP tools are executed during agent responses, you'll receive detailed events:
+## Tool events
 
-### Execution Events
+While streaming, Glyfs sends structured events. Exact shape from the API:
 
+### Start
 ```json
 {
   "type": "tool_event",
-  "content": "",
   "data": {
-    "tool_name": "database_query",
-    "status": "executing",
-    "message": "Querying customer database...",
-    "progress": 0.5
+    "type": "tool_start",
+    "call_id": "call_123",
+    "tool_name": "web_search",
+    "arguments": { "query": "latest AI news" }
   }
 }
 ```
 
-### Success Events
-
+### Result
 ```json
 {
   "type": "tool_event",
-  "content": "",
   "data": {
-    "tool_name": "database_query",
-    "status": "completed",
-    "result": {
-      "rows": [...],
-      "count": 150,
-      "execution_time": "0.23s"
-    }
+    "type": "tool_result",
+    "call_id": "call_123",
+    "tool_name": "web_search",
+    "result": "…string payload (may be large)…",
+    "duration_ms": 312
   }
 }
 ```
 
-### Error Events
-
+### Error
 ```json
 {
   "type": "tool_event",
-  "content": "",
   "data": {
-    "tool_name": "database_query",
-    "status": "error",
-    "error": {
-      "code": "QUERY_TIMEOUT",
-      "message": "Query execution timed out after 30 seconds",
-      "details": {...}
-    }
+    "type": "tool_error",
+    "call_id": "call_123",
+    "tool_name": "web_search",
+    "error": "timeout",
+    "duration_ms": 30000
   }
 }
 ```
 
-## Available MCP Tools
+Between batches of tool calls you may also see:
+```json
+{ "type": "tool_event", "data": { "type": "tool_batch_complete" } }
+```
+
+## Tool categories
 
 ### Database Tools
 - **SQL Query**: Execute SELECT, INSERT, UPDATE queries
@@ -108,24 +104,24 @@ When MCP tools are executed during agent responses, you'll receive detailed even
 - **Data Processing**: Transform and analyze datasets
 - **Report Generation**: Create charts, graphs, and reports
 
-## Security Considerations
+## Security
 
 <Callout type="warning">
 **Important**: MCP tools execute with agent permissions. Always review tool configurations and limit access to necessary resources only.
 </Callout>
 
-### Permission Management
+### Permission management
 - Tools inherit agent-level permissions
 - Network access can be restricted
 - File system access is sandboxed
 - Database connections use read-only credentials where possible
 
-### Data Privacy
+### Data privacy
 - Tool inputs and outputs are logged for debugging
 - Sensitive data should be handled according to your privacy policy
 - Consider data residency requirements for tool execution
 
-## Development Guidelines
+## Building your own server
 
 ### Tool Development Best Practices
 
@@ -135,7 +131,7 @@ When MCP tools are executed during agent responses, you'll receive detailed even
 4. **Resource Management**: Clean up resources properly
 5. **Documentation**: Provide clear tool descriptions and examples
 
-### Example MCP Server Structure
+### Minimal tool manifest
 
 ```json
 {
@@ -160,9 +156,9 @@ When MCP tools are executed during agent responses, you'll receive detailed even
 }
 ```
 
-## Monitoring and Debugging
+## Monitor & debug
 
-### Tool Execution Logs
+### Tool execution
 
 Monitor tool execution through the agent dashboard:
 
@@ -171,7 +167,7 @@ Monitor tool execution through the agent dashboard:
 - Error messages and stack traces
 - Performance metrics and resource usage
 
-### Common Issues
+### Common issues
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
@@ -180,7 +176,7 @@ Monitor tool execution through the agent dashboard:
 | Connection failed | Network or server issues | Check MCP server connectivity |
 | Invalid parameters | Incorrect tool input | Validate parameters before calling |
 
-## Integration Examples
+## Handle tool events in code
 
 ### JavaScript Tool Event Handling
 

@@ -9,6 +9,8 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Complete guide to authentication with the Glyfs API.
 
+---
+
 ## Overview
 
 Glyfs uses **agent-specific API keys** for authentication. Each agent you create can have multiple API keys, and each API key only provides access to that specific agent.
@@ -66,17 +68,7 @@ curl -X POST "https://glyfs.dev/api/agents/your-agent-id/invoke" \
   }'
 ```
 
-## Authentication Flow
-
-Here's what happens when you make an API request:
-
-1. **Request received**: Server extracts the Authorization header
-2. **Format validation**: Checks that header starts with "Bearer apk_"
-3. **Key hashing**: Computes SHA-256 hash of the provided key
-4. **Database lookup**: Searches for active API key with matching hash
-5. **Agent resolution**: Loads the associated agent configuration
-6. **Usage tracking**: Updates the last_used timestamp
-7. **Context injection**: Makes agent available to the handler
+---
 
 ## Error Responses
 

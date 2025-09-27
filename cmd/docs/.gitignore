@@ -1,28 +1,53 @@
-# deps
-/node_modules
-
-# generated content
-.contentlayer
-.content-collections
-.source
-
-# test & build
-/coverage
-/.next/
-/out/
-/build
-*.tsbuildinfo
-
-# misc
-.DS_Store
-*.pem
-/.pnp
+# Dependencies
+node_modules/
+.pnp
 .pnp.js
+
+# Next.js build output
+.next/
+out/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# others
-.env*.local
-.vercel
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# TypeScript cache
+*.tsbuildinfo
 next-env.d.ts
+
+# Source generation cache
+.source/

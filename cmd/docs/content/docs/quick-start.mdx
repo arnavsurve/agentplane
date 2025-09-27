@@ -1,65 +1,95 @@
 ---
 title: Quick Start
-description: Get started with Glyfs in 2 minutes
+description: Create an agent, copy a key, make a call.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
 # Quick Start
 
-## Setup (2 minutes)
+## 1) Create and get a key
 
 | Step | Action |
 |------|--------|
-| 1 | Go to [glyfs.dev](https://glyfs.dev) → Sign in → Create Agent |
-| 2 | Agent Settings → API tab → Generate New Key |
-| 3 | **Copy the key** (shown once only) |
+| 1 | Sign in → Create Agent |
+| 2 | Agent → API tab → Generate New Key |
+| 3 | Copy the key (shown once) |
 
-## Test Your Agent
+## 2) Call the API
 
-Replace `YOUR_AGENT_ID` and `YOUR_API_KEY`:
+Run one of these:
 
+### cURL
 ```bash
-curl -X POST "https://glyfs.dev/api/agents/YOUR_AGENT_ID/invoke" \
-  -H "Authorization: Bearer apk_YOUR_API_KEY" \
+export GLYFS_AGENT_ID="REPLACE_ME"
+export GLYFS_API_KEY="apk_REPLACE_ME"
+
+curl -sS -X POST "https://glyfs.dev/api/agents/$GLYFS_AGENT_ID/invoke" \
+  -H "Authorization: Bearer $GLYFS_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"message": "Hello!"}'
+  -d '{"message": "Say hi in one short sentence"}' | jq
 ```
 
-**Expected response:**
+### JavaScript (Node)
+```js
+const AGENT = process.env.GLYFS_AGENT_ID;
+const KEY = process.env.GLYFS_API_KEY;
+
+const res = await fetch(`https://glyfs.dev/api/agents/${AGENT}/invoke`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${KEY}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ message: 'Say hi in one short sentence' }),
+});
+console.log(await res.json());
+```
+
+### Python
+```python
+import os, requests
+agent = os.environ['GLYFS_AGENT_ID']
+key = os.environ['GLYFS_API_KEY']
+
+r = requests.post(
+  f"https://glyfs.dev/api/agents/{agent}/invoke",
+  headers={
+    'Authorization': f'Bearer {key}',
+    'Content-Type': 'application/json'
+  },
+  json={ 'message': 'Say hi in one short sentence' }
+)
+print(r.json())
+```
+
+Expected shape:
 ```json
 {
-  "response": "Hello! How can I help you today?",
-  "usage": {"total_tokens": 20}
+  "response": "Hello! 👋",
+  "usage": { "prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10 }
 }
 ```
 
-## Streaming (Live Responses)
+## 3) Stream it (optional)
 
+### cURL (SSE)
 ```bash
-curl -N "https://glyfs.dev/api/agents/YOUR_AGENT_ID/invoke/stream" \
-  -H "Authorization: Bearer apk_YOUR_API_KEY" \
+curl -N "https://glyfs.dev/api/agents/$GLYFS_AGENT_ID/invoke/stream" \
+  -H "Authorization: Bearer $GLYFS_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"message": "Count to 5"}'
+  -d '{"message": "Count to 3"}'
 ```
 
-You'll see tokens arrive in real-time:
+You’ll see events like:
 ```
-data: {"type":"token","content":"1"}
-data: {"type":"token","content":"..."}
-data: {"type":"token","content":"2"}
+data: {"type":"metadata","data":{"agent_id":"..."}}
+data: {"type":"token","content":"One"}
+data: {"type":"token","content":" … "}
+data: {"type":"token","content":"Two"}
+data: {"type":"done","data":{"response":"One … Two … Three."}}
 ```
 
-## What's Next?
+---
 
-<Callout type="info">
-**Ready to code?** - **[Examples →](/docs/examples/)** - Copy-paste code in your language
-</Callout>
-
-<Callout type="note">
-**Need details?** - **[API Reference →](/docs/api/)** - Complete endpoint docs
-</Callout>
-
-<Callout type="warning">
-**Security** - **[Authentication →](/docs/authentication)** - API key best practices
-</Callout>
+Next: [Examples](/docs/examples/) • [API](/docs/api/) • [Auth](/docs/authentication)
