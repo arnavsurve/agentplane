@@ -1,49 +1,38 @@
 ---
-title: Introduction
-description: AI agent infrastructure platform. Deploy, manage, and interact with agents at scale.
+title: Docs
+description: Create an agent, call it from code, add tools.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-# Introduction
+## Start
 
-AI agent infrastructure platform. Deploy, manage, and interact with agents at scale.
+<div className="grid gap-4 md:grid-cols-2">
+  <a href="/docs/quick-start" className="block rounded-lg border p-4 hover:bg-muted/50 transition">
+    <div className="text-xs text-muted-foreground">Getting started</div>
+    <div className="text-lg font-semibold mt-1">Quick Start</div>
+    <p className="mt-2 text-sm">Create an agent, generate a key, make your first call.</p>
+  </a>
+  <a href="/docs/api/" className="block rounded-lg border p-4 hover:bg-muted/50 transition">
+    <div className="text-xs text-muted-foreground">HTTP</div>
+    <div className="text-lg font-semibold mt-1">API Reference</div>
+    <p className="mt-2 text-sm">Endpoints for invoke and streaming.</p>
+  </a>
+  <a href="/docs/tools/mcp" className="block rounded-lg border p-4 hover:bg-muted/50 transition">
+    <div className="text-xs text-muted-foreground">Extend</div>
+    <div className="text-lg font-semibold mt-1">MCP Tools</div>
+    <p className="mt-2 text-sm">Connect HTTP/SSE tools. See live tool events.</p>
+  </a>
+  <a href="/docs/examples/" className="block rounded-lg border p-4 hover:bg-muted/50 transition">
+    <div className="text-xs text-muted-foreground">Code</div>
+    <div className="text-lg font-semibold mt-1">Examples</div>
+    <p className="mt-2 text-sm">Copy‑paste JS, Python, cURL.</p>
+  </a>
+</div>
 
-## Quick Overview
+## APIs
 
-| Feature | What it does |
-|---------|-------------|
-| 🔐 **Agent-scoped keys** | Each agent gets its own API keys |
-| ⚡ **Real-time streaming** | Live responses via Server-Sent Events |
-| 🛠 **Tool integration** | Connect external tools via MCP |
-| 📊 **Usage tracking** | Monitor tokens and costs |
-
-## Start Here
-
-```mermaid
-graph LR
-    A[Create Agent] --> B[Get API Key]
-    B --> C[Make Request]
-    C --> D[Get Response]
-```
-
-1. **[Quick Start →](/docs/quick-start)** - 5-minute setup
-2. **[API Reference →](/docs/api/)** - Complete endpoints  
-3. **[Examples →](/docs/examples/javascript)** - Copy-paste code
-
-## Two API Endpoints
-
-<Callout type="info">
-**Simple Request/Response** - Use `/invoke` for complete answers in one call.
-</Callout>
-
-<Callout type="note">
-**Real-time Streaming** - Use `/invoke/stream` for live token-by-token responses.
-</Callout>
-
-## Common Use Cases
-
-- Chat interfaces
-- Content generation  
-- Data analysis
-- Workflow automation
+| Call | Endpoint | Use |
+|------|----------|-----|
+| Invoke | `POST /api/agents/:id/invoke` | Full response in one go |
+| Stream | `POST /api/agents/:id/invoke/stream` | Live tokens + tool events |
