@@ -57,8 +57,18 @@ if [ ! -z "$CURRENT_CONTAINER" ]; then
     # Create backup tag of current image if container is running
     if [ "$(docker ps -q --filter "name=^${CONTAINER_NAME}$")" ]; then
         CURRENT_IMAGE=$(docker inspect $CURRENT_CONTAINER --format='{{.Config.Image}}')
+        
+        # Tag as rollback and push to ECR for emergency use
         docker tag $CURRENT_IMAGE $ECR_REGISTRY/$ECR_REPOSITORY:rollback
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:rollback
+        
+        # Also tag with timestamp for history
+        TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+        docker tag $CURRENT_IMAGE $ECR_REGISTRY/$ECR_REPOSITORY:backup-$TIMESTAMP
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:backup-$TIMESTAMP
+        
         log_info "Tagged current image as rollback: $CURRENT_IMAGE"
+        log_info "Backup tagged as: backup-$TIMESTAMP"
     fi
 fi
 

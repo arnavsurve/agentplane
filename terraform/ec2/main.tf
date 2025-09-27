@@ -44,9 +44,12 @@ resource "aws_instance" "app" {
   iam_instance_profile   = var.iam_instance_profile
 
   user_data = file("${path.module}/user_data.sh")
+  
+  # Force replacement when userdata changes
+  user_data_replace_on_change = true
 
   root_block_device {
-    volume_size = 10
+    volume_size = 30
     volume_type = "gp3"
   }
 
