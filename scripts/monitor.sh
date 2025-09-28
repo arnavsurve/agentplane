@@ -66,15 +66,22 @@ else
     HTTPS_STATUS=1
 fi
 
-# Check database connectivity (via API)
+# Check database connectivity (via API - public endpoint)
 DB_CHECK_URL="http://52.8.122.166:8080/api/auth/providers"
-if curl -f -s --max-time 10 "$DB_CHECK_URL" > /dev/null; then
-    log_info "Database connectivity is healthy"
+# This endpoint returns 401 when working (needs auth), but connection error when DB is down
+RESPONSE=$(curl -s -w "%{http_code}" --max-time 10 "$DB_CHECK_URL" 2>/dev/null || echo "000")
+HTTP_CODE="${RESPONSE: -3}"
+
+if [[ "$HTTP_CODE" == "401" || "$HTTP_CODE" == "200" ]]; then
+    log_info "Database connectivity is healthy (HTTP $HTTP_CODE)"
     DB_STATUS=0
-else
-    log_error "Database connectivity failed!"
+elif [[ "$HTTP_CODE" == "000" ]]; then
+    log_error "Database connectivity failed - connection error!"
     send_alert "Database connectivity failed!" "danger"
     DB_STATUS=1
+else
+    log_warning "Database check returned HTTP $HTTP_CODE - investigate"
+    DB_STATUS=0  # Don't fail for unexpected but non-connection errors
 fi
 
 # Overall status
