@@ -76,14 +76,36 @@ func (s *LLMService) GenerateResponse(ctx context.Context, agent *shared.AgentCo
 		llms.WithTemperature(agent.Temperature),
 	}
 
-	if len(toolsList) > 0 {
-		llmsTools := s.convertToLLMSTools(toolsList)
-		opts = append(opts, llms.WithTools(llmsTools))
-	}
-
 	if agent.MaxTokens > 0 {
 		opts = append(opts, llms.WithMaxTokens(agent.MaxTokens))
 	}
+
+	// If we have tools, use the full tool execution flow like streaming does
+	if len(toolsList) > 0 {
+		toolsMap := make(map[string]tools.Tool)
+		for _, tool := range toolsList {
+			toolsMap[tool.Name()] = tool
+		}
+		
+		var responseBuilder strings.Builder
+		streamFunc := func(chunk string) {
+			responseBuilder.WriteString(chunk)
+		}
+		toolEventFunc := func(event *shared.ToolCallEvent) {
+			// For non-streaming, we don't need to handle tool events
+		}
+		
+		err = s.generateWithToolSupport(ctx, llm, agent, messages, toolsList, toolsMap, streamFunc, toolEventFunc)
+		if err != nil {
+			return nil, fmt.Errorf("generating response with tools: %w", err)
+		}
+		
+		return &shared.AgentInferenceResponse{
+			Response: responseBuilder.String(),
+		}, nil
+	}
+
+	// No tools - use simple API call
 
 	content, err := llm.GenerateContent(ctx, messages, opts...)
 	if err != nil {
