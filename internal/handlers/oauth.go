@@ -13,7 +13,6 @@ import (
 
 	"github.com/arnavsurve/glyfs/internal/shared"
 	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/google"
@@ -275,7 +274,14 @@ func (oh *OAuthHandler) findOrCreateOAuthUser(githubUser *shared.GitHubUser) (*s
 		if user.AuthProvider == shared.AuthProviderLocal {
 			return nil, fmt.Errorf("email already exists with password login")
 		}
-		return &user, nil
+		if user.OAuthID != nil && *user.OAuthID != oauthID {
+			return nil, fmt.Errorf("email already registered with a different OAuth account")
+		}
+		user.AuthProvider = string(shared.OAuthProviderGitHub)
+		user.OAuthID = &oauthID
+		user.DisplayName = &githubUser.Name
+		user.AvatarURL = &githubUser.AvatarURL
+		return &user, oh.DB.Save(&user).Error
 	}
 
 	user = shared.User{
@@ -285,11 +291,6 @@ func (oh *OAuthHandler) findOrCreateOAuthUser(githubUser *shared.GitHubUser) (*s
 		DisplayName:  &githubUser.Name,
 		AvatarURL:    &githubUser.AvatarURL,
 	}
-
-	randomPass := make([]byte, 32)
-	rand.Read(randomPass)
-	hashedPassword, _ := bcrypt.GenerateFromPassword(randomPass, bcrypt.DefaultCost)
-	user.PasswordHash = hashedPassword
 
 	return &user, oh.DB.Create(&user).Error
 }
@@ -314,7 +315,14 @@ func (oh *OAuthHandler) findOrCreateGoogleUser(googleUser *shared.GoogleUser) (*
 			user.AvatarURL = &googleUser.Picture
 			return &user, oh.DB.Save(&user).Error
 		}
-		return &user, nil
+		if user.OAuthID != nil && *user.OAuthID != oauthID {
+			return nil, fmt.Errorf("email already registered with a different OAuth account")
+		}
+		user.AuthProvider = string(shared.OAuthProviderGoogle)
+		user.OAuthID = &oauthID
+		user.DisplayName = &googleUser.Name
+		user.AvatarURL = &googleUser.Picture
+		return &user, oh.DB.Save(&user).Error
 	}
 
 	user = shared.User{
@@ -324,11 +332,6 @@ func (oh *OAuthHandler) findOrCreateGoogleUser(googleUser *shared.GoogleUser) (*
 		DisplayName:  &googleUser.Name,
 		AvatarURL:    &googleUser.Picture,
 	}
-
-	randomPass := make([]byte, 32)
-	rand.Read(randomPass)
-	hashedPassword, _ := bcrypt.GenerateFromPassword(randomPass, bcrypt.DefaultCost)
-	user.PasswordHash = hashedPassword
 
 	return &user, oh.DB.Create(&user).Error
 }
