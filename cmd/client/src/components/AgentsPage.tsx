@@ -59,15 +59,10 @@ export function AgentsPage() {
     <div className="p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <div className="flex items-center space-x-2 mb-2">
-              <Bot className="w-6 h-6 text-primary" />
-              <h1 className="text-3xl font-bold">Agents</h1>
-            </div>
-            <p className="text-muted-foreground">
-              Manage your agents and their configurations.
-            </p>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <Bot className="w-6 h-6 text-primary" />
+            <h1 className="text-3xl font-bold">Agents</h1>
           </div>
           <div className="flex items-center gap-4">
             {/* Agent Limit Indicator */}
@@ -115,27 +110,24 @@ export function AgentsPage() {
           </div>
         ) : agents.length === 0 ? (
           // Empty State
-          <div className="flex items-center justify-center h-96 border-2 border-dashed border-border rounded-lg">
+          <div className="flex items-center justify-center h-96 border border-dashed border-border rounded-lg">
             <div className="text-center">
-              <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-muted-foreground mb-2">
-                No Agents Found
-              </h3>
-              <p className="text-sm text-muted-foreground mb-6">
-                Create your first agent to get started.
+              <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+              <p className="text-sm text-muted-foreground mb-4">
+                No agents yet
               </p>
               <Button
                 onClick={handleCreateClick}
-                className="flex items-center space-x-2 mx-auto"
+                size="sm"
               >
-                <Plus className="w-4 h-4" />
-                <span>Create Agent</span>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Agent
               </Button>
             </div>
           </div>
         ) : (
-          // Agent List
-          <div className="space-y-4">
+          // Agent Grid
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {agents.map((agent) => (
               <AgentCard key={agent.id} agent={agent} />
             ))}

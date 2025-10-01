@@ -55,46 +55,65 @@ export function AgentCard({ agent }: AgentCardProps) {
 
   return (
     <Card
-      className="overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary/20"
+      className="overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary/30 h-full"
       onClick={handleCardClick}
     >
-      <CardContent className="p-4">
-        {/* Header with name and chevron */}
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-semibold">{agent.name}</h3>
-          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+      <CardContent className="p-4 flex flex-col h-full">
+        {/* Agent Name */}
+        <h3 className="text-xl font-semibold mb-3 truncate">{agent.name}</h3>
+
+        {/* Model & Provider */}
+        <div className="mb-4">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+            Model
+          </p>
+          <p className="text-sm font-medium">
+            {getProviderDisplayName(agent.provider)} • {getModelDisplayName()}
+          </p>
         </div>
 
-        {/* Model info */}
-        <p className="text-sm text-muted-foreground mb-3">
-          {getProviderDisplayName(agent.provider)} • {getModelDisplayName()}
-        </p>
+        {/* Parameters Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+              Temperature
+            </p>
+            <p className="text-sm font-medium">
+              {agent.temperature !== undefined ? agent.temperature : "0.5"}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+              Max Tokens
+            </p>
+            <p className="text-sm font-medium">
+              {agent.max_tokens || "2048"}
+            </p>
+          </div>
+        </div>
 
-        {/* System prompt preview */}
-        <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-          {agent.system_prompt
-            ? agent.system_prompt.length > 50
-              ? `${agent.system_prompt.substring(0, 50)}...`
-              : agent.system_prompt
-            : ""}
-        </p>
-
-        {/* Invoke URL */}
-        <div
-          className="p-2 bg-muted/50 rounded border border-border text-xs text-muted-foreground flex items-center hover:text-foreground transition-colors group cursor-pointer"
-          onClick={copyInvokeUrl}
-          title="Click to copy API URL"
-        >
-          <code className="flex-grow truncate">
-            /api/agents/{getTruncatedId()}/invoke
-          </code>
-          <span className="flex-shrink-0 ml-2">
+        {/* Agent ID with copy */}
+        <div className="mt-auto">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+            Agent ID
+          </p>
+          <div
+            className="flex items-center gap-2 p-2 bg-muted/50 rounded border border-border hover:bg-muted transition-colors group"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigator.clipboard.writeText(agent.id || "");
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+            title="Click to copy"
+          >
+            <code className="text-xs flex-1 truncate">{agent.id}</code>
             {copied ? (
-              <Check className="w-3 h-3 text-green-500" />
+              <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
             ) : (
-              <Copy className="w-3 h-3 opacity-50 group-hover:opacity-100" />
+              <Copy className="w-3 h-3 opacity-50 group-hover:opacity-100 flex-shrink-0" />
             )}
-          </span>
+          </div>
         </div>
       </CardContent>
     </Card>
