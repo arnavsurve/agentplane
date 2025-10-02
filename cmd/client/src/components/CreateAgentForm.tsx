@@ -1,17 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Bot, Loader2, ArrowLeft, Sparkles, AlertCircle } from "lucide-react";
+import { Bot, Loader2, ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { TemperatureSlider } from "./ui/temperature-slider";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "./ui/card";
 import {
   Select,

@@ -22,7 +22,6 @@ import { TemperatureSlider } from "./ui/temperature-slider";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "./ui/card";

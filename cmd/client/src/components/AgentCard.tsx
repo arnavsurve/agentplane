@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Check, ChevronRight } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import type { Agent } from "../types/agent.types";
 import { MODELS, getProviderDisplayName } from "../types/agent.types";
@@ -20,32 +20,6 @@ export function AgentCard({ agent }: AgentCardProps) {
 
     const model = MODELS[provider].find((m) => m.value === agent.llm_model);
     return model ? model.label : agent.llm_model;
-  };
-
-  // Generate the invoke URL
-  const getInvokeUrl = () => {
-    return `${window.location.origin}/api/agents/${agent.id}/invoke`;
-  };
-
-  // Truncate the agent ID for display
-  const getTruncatedId = () => {
-    if (!agent.id) return "unknown";
-    if (agent.id.length <= 8) return agent.id;
-    return `${agent.id.substring(0, 8)}...`;
-  };
-
-  // Copy the invoke URL to clipboard
-  const copyInvokeUrl = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click when copying URL
-    navigator.clipboard
-      .writeText(getInvokeUrl())
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      })
-      .catch((err) => {
-        console.error("Failed to copy:", err);
-      });
   };
 
   // Handle card click to navigate to agent detail
