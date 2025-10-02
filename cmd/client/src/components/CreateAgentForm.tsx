@@ -116,17 +116,7 @@ export function CreateAgentForm() {
 
         {/* Form */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              <span>Agent Configuration</span>
-            </CardTitle>
-            <CardDescription>
-              Set up your agent's identity, model, and behavior parameters
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
+          <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Error Display */}
               {error && (
@@ -151,9 +141,9 @@ export function CreateAgentForm() {
               {/* Basic Info */}
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="name" className="text-sm font-medium">
+                  <label htmlFor="name" className="text-xs text-muted-foreground uppercase tracking-wide">
                     Agent Name *
-                  </Label>
+                  </label>
                   <Input
                     id="name"
                     type="text"
@@ -165,18 +155,15 @@ export function CreateAgentForm() {
                     required
                     className="mt-1"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Choose a descriptive name for your agent
-                  </p>
                 </div>
 
                 <div>
-                  <Label
+                  <label
                     htmlFor="system_prompt"
-                    className="text-sm font-medium"
+                    className="text-xs text-muted-foreground uppercase tracking-wide"
                   >
                     System Prompt
-                  </Label>
+                  </label>
                   <Textarea
                     id="system_prompt"
                     placeholder="You are a helpful AI assistant. Your role is to... (optional)"
@@ -202,9 +189,9 @@ export function CreateAgentForm() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="provider" className="text-sm font-medium">
+                    <label htmlFor="provider" className="text-xs text-muted-foreground uppercase tracking-wide">
                       Provider *
-                    </Label>
+                    </label>
                     <Select
                       value={formData.provider}
                       onValueChange={handleProviderChange}
@@ -225,9 +212,9 @@ export function CreateAgentForm() {
                   </div>
 
                   <div>
-                    <Label htmlFor="model" className="text-sm font-medium">
+                    <label htmlFor="model" className="text-xs text-muted-foreground uppercase tracking-wide">
                       Model *
-                    </Label>
+                    </label>
                     <Select
                       value={formData.model}
                       onValueChange={(value: string) =>
@@ -255,9 +242,9 @@ export function CreateAgentForm() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="max_tokens" className="text-sm font-medium">
+                    <label htmlFor="max_tokens" className="text-xs text-muted-foreground uppercase tracking-wide">
                       Max Tokens
-                    </Label>
+                    </label>
                     <Input
                       id="max_tokens"
                       type="number"

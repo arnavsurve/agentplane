@@ -457,37 +457,55 @@ export function AgentDetailView() {
   const availableModels = MODELS[selectedProvider] || [];
 
   return (
-    <div className="flex flex-col bg-background min-h-screen">
+    <div className="flex flex-col bg-background h-full">
       {/* Fixed Header */}
-      <div className="sticky top-0 z-10 border-b bg-card px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+      <div className="sticky top-0 z-10 border-b bg-card px-6 py-3">
+        <div className="flex items-center justify-between gap-6">
+          {/* Left: Back button + Agent info */}
+          <div className="flex items-center gap-4 min-w-0 flex-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handleNavigation("/app/agents")}
-              className="flex items-center space-x-2"
+              className="flex items-center flex-shrink-0"
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
 
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Bot className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">{agent.name}</h1>
-                <p className="text-sm text-muted-foreground">
-                  {getProviderDisplayName(agent.provider)} •{" "}
-                  {getModelDisplayName()} • Created{" "}
-                  {new Date(agent.created_at).toLocaleDateString()}
-                </p>
-              </div>
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold truncate">{agent.name}</h1>
+              <p className="text-xs text-muted-foreground truncate">
+                {getProviderDisplayName(agent.provider)} •{" "}
+                {getModelDisplayName()} • Created{" "}
+                {new Date(agent.created_at).toLocaleDateString()}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            {/* Debug: hasUnsavedChanges = {hasUnsavedChanges.toString()} */}
+          {/* Center: Tabs */}
+          <div className="flex space-x-2 flex-shrink-0">
+            {[
+              { id: "overview", label: "Overview", icon: Bot },
+              { id: "tools", label: "Tools", icon: Wrench },
+              { id: "api", label: "API", icon: Code },
+            ].map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTabWithPersistence(id as any)}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                  activeTab === id
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Right: Action buttons */}
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <Button
               onClick={handleSave}
               disabled={isSaving || !hasUnsavedChanges}
@@ -540,28 +558,6 @@ export function AgentDetailView() {
             </AlertDialog>
           </div>
         </div>
-
-        {/* Tabs */}
-        <div className="flex space-x-6 mt-6">
-          {[
-            { id: "overview", label: "Overview", icon: Bot },
-            { id: "tools", label: "Tools", icon: Wrench },
-            { id: "api", label: "API", icon: Code },
-          ].map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTabWithPersistence(id as any)}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                activeTab === id
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{label}</span>
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Content */}
@@ -576,17 +572,16 @@ export function AgentDetailView() {
 
             {/* Overview Tab */}
             {activeTab === "overview" && (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <Card>
                   <CardHeader>
                     <CardTitle>Basic Information</CardTitle>
-                    <CardDescription>
-                      Core details and identity of your agent
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label htmlFor="agent-name">Agent Name</Label>
+                      <label htmlFor="agent-name" className="text-xs text-muted-foreground uppercase tracking-wide">
+                        Agent Name
+                      </label>
                       <Input
                         id="agent-name"
                         value={editForm.name || ""}
@@ -601,7 +596,9 @@ export function AgentDetailView() {
                     </div>
 
                     <div>
-                      <Label htmlFor="system-prompt">System Prompt</Label>
+                      <label htmlFor="system-prompt" className="text-xs text-muted-foreground uppercase tracking-wide">
+                        System Prompt
+                      </label>
                       <Textarea
                         id="system-prompt"
                         value={editForm.system_prompt || ""}
@@ -621,14 +618,13 @@ export function AgentDetailView() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Model Configuration</CardTitle>
-                    <CardDescription>
-                      AI model and provider settings
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label>Provider</Label>
+                        <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                          Provider
+                        </label>
                         <Select
                           value={editForm.provider || agent.provider}
                           onValueChange={handleProviderChange}
@@ -651,7 +647,9 @@ export function AgentDetailView() {
                       </div>
 
                       <div>
-                        <Label>Model</Label>
+                        <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                          Model
+                        </label>
                         <Select
                           value={editForm.model || agent.llm_model}
                           onValueChange={(value: string) =>
@@ -677,14 +675,13 @@ export function AgentDetailView() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Response Parameters</CardTitle>
-                    <CardDescription>
-                      Control how your agent generates responses
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="max-tokens">Max Tokens</Label>
+                        <label htmlFor="max-tokens" className="text-xs text-muted-foreground uppercase tracking-wide">
+                          Max Tokens
+                        </label>
                         <Input
                           id="max-tokens"
                           type="number"
@@ -720,14 +717,13 @@ export function AgentDetailView() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Agent Details</CardTitle>
-                    <CardDescription>
-                      Technical information and identifiers
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label>Agent ID</Label>
+                        <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                          Agent ID
+                        </label>
                         <div className="flex items-center space-x-2 mt-1">
                           <Input
                             value={agent.id}
@@ -749,7 +745,9 @@ export function AgentDetailView() {
                       </div>
 
                       <div>
-                        <Label>Provider</Label>
+                        <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                          Provider
+                        </label>
                         <Input
                           value={getProviderDisplayName(agent.provider)}
                           readOnly
@@ -760,7 +758,9 @@ export function AgentDetailView() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label>Created</Label>
+                        <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                          Created
+                        </label>
                         <Input
                           value={new Date(agent.created_at).toLocaleString()}
                           readOnly
@@ -769,7 +769,9 @@ export function AgentDetailView() {
                       </div>
 
                       <div>
-                        <Label>Last Updated</Label>
+                        <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                          Last Updated
+                        </label>
                         <Input
                           value={new Date(agent.updated_at).toLocaleString()}
                           readOnly
@@ -787,7 +789,7 @@ export function AgentDetailView() {
 
             {/* API Tab */}
             {activeTab === "api" && (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -801,19 +803,18 @@ export function AgentDetailView() {
                         onClick={() =>
                           window.open("/docs/invoke-api", "_blank")
                         }
-                        className="flex items-center space-x-1 hover:text-foreground"
+                        className="flex items-center space-x-1"
                       >
-                        <span className="text-xs">Documentation</span>
+                        <span className="text-xs">Docs</span>
                         <ExternalLink className="w-3 h-3" />
                       </Button>
                     </div>
-                    <CardDescription>
-                      HTTP endpoint for single request/response interactions
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label>Invoke URL</Label>
+                      <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                        Invoke URL
+                      </label>
                       <div className="flex items-center space-x-2 mt-1">
                         <Input
                           value={getApiUrl()}
@@ -859,13 +860,6 @@ export function AgentDetailView() {
   }'`}
                       </pre>
                     </div>
-
-                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <p className="text-xs text-blue-800 dark:text-blue-200">
-                        For simple Q&A, batch processing, and when you need the
-                        complete response in a single request.
-                      </p>
-                    </div>
                   </CardContent>
                 </Card>
 
@@ -882,20 +876,18 @@ export function AgentDetailView() {
                         onClick={() =>
                           window.open("/docs/streaming-api", "_blank")
                         }
-                        className="flex items-center space-x-1 hover:text-foreground"
+                        className="flex items-center space-x-1"
                       >
-                        <span className="text-xs">Documentation</span>
+                        <span className="text-xs">Docs</span>
                         <ExternalLink className="w-3 h-3" />
                       </Button>
                     </div>
-                    <CardDescription>
-                      Server-Sent Events endpoint for real-time streaming
-                      responses
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label>Streaming URL</Label>
+                      <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                        Streaming URL
+                      </label>
                       <div className="flex items-center space-x-2 mt-1">
                         <Input
                           value={getStreamApiUrl()}
@@ -946,14 +938,6 @@ data: {"type":"token","content":" a","data":null}
 data: {"type":"done","content":"","data":{"response":"Once upon a time...","usage":{"total_tokens":25}}}`}
                       </pre>
                     </div>
-
-                    <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
-                      <p className="text-xs text-green-800 dark:text-green-200">
-                        For interactive chat interfaces, real-time content
-                        generation, and providing immediate user feedback during
-                        response generation.
-                      </p>
-                    </div>
                   </CardContent>
                 </Card>
 
@@ -963,9 +947,6 @@ data: {"type":"done","content":"","data":{"response":"Once upon a time...","usag
                       <Key className="w-5 h-5" />
                       <span>API Keys</span>
                     </CardTitle>
-                    <CardDescription>
-                      Manage API keys for programmatic access to your agent
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between mb-8">
@@ -984,11 +965,8 @@ data: {"type":"done","content":"","data":{"response":"Once upon a time...","usag
                       </div>
                     ) : apiKeys.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
-                        <Key className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                        <p>No API keys created yet</p>
-                        <p className="text-xs">
-                          Generate your first API key to get started
-                        </p>
+                        <Key className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                        <p className="text-sm">No API keys yet</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
@@ -1065,10 +1043,6 @@ data: {"type":"done","content":"","data":{"response":"Once upon a time...","usag
                           <AlertDialogTitle>
                             Create New API Key
                           </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Give your API key a descriptive name to help you
-                            identify its purpose.
-                          </AlertDialogDescription>
                         </AlertDialogHeader>
                         <div className="py-4">
                           <Label htmlFor="key-name">Key Name</Label>
@@ -1111,10 +1085,6 @@ data: {"type":"done","content":"","data":{"response":"Once upon a time...","usag
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>API Key Created</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Save this API key now. You won't be able to see it
-                              again.
-                            </AlertDialogDescription>
                           </AlertDialogHeader>
                           <div className="py-4">
                             <Label>Your API Key</Label>

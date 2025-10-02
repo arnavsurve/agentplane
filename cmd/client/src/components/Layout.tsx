@@ -87,7 +87,12 @@ export function Layout() {
         <div className="flex items-center justify-between">
           {/* Logo/Title */}
           <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-semibold">Glyfs</h1>
+            <h1
+              className="text-2xl font-semibold select-none cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => navigate("/app/dashboard")}
+            >
+              Glyfs
+            </h1>
           </div>
 
           {/* User Config */}

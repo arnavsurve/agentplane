@@ -16,6 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
@@ -36,6 +37,7 @@ import { ToolCallDisplay } from "./ToolCallDisplay";
 interface ChatPageProps {}
 
 export function ChatPage({}: ChatPageProps) {
+  const navigate = useNavigate();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -492,20 +494,17 @@ export function ChatPage({}: ChatPageProps) {
             </div>
 
             {/* Agent Selector */}
-            <div className="p-4 border-b border-border">
-              <label className="text-sm font-medium mb-2 block">
-                Select Agent
-              </label>
+            <div className="p-3 border-b border-border">
               {isLoadingAgents ? (
                 <div className="flex items-center justify-center h-10 bg-muted rounded-md">
                   <span className="text-sm text-muted-foreground">
-                    Loading agents...
+                    Loading...
                   </span>
                 </div>
               ) : agents.length === 0 ? (
                 <div className="flex items-center justify-center h-10 bg-muted rounded-md">
                   <span className="text-sm text-muted-foreground">
-                    No agents found
+                    No agents
                   </span>
                 </div>
               ) : (
@@ -556,7 +555,7 @@ export function ChatPage({}: ChatPageProps) {
             </div>
 
             {/* New Chat Button */}
-            <div className="p-4 border-b border-border">
+            <div className="p-3 border-b border-border">
               <Button
                 onClick={startNewSession}
                 className="w-full"
@@ -568,8 +567,7 @@ export function ChatPage({}: ChatPageProps) {
             </div>
 
             {/* Sessions List */}
-            <div className="flex-1 overflow-y-auto p-4">
-              <h3 className="text-sm font-medium mb-2">Recent Chats</h3>
+            <div className="flex-1 overflow-y-auto p-3">
               <div className="space-y-2">
                 {sessions.map((session) => (
                   <div
@@ -628,19 +626,11 @@ export function ChatPage({}: ChatPageProps) {
             <div className="flex-1 overflow-y-auto p-4">
               {messages.length === 0 && !isStreaming ? (
                 <div className="flex items-center justify-center h-full">
-                  <div className="text-center max-w-md">
-                    <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-                    <h3 className="text-xl font-semibold mb-3">
-                      Start a Conversation
-                    </h3>
-                    <p className="text-muted-foreground mb-6">
-                      Begin chatting with{" "}
-                      <span className="font-medium">{selectedAgent.name}</span>.
+                  <div className="text-center">
+                    <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                    <p className="text-muted-foreground text-sm">
+                      Send a message to start chatting
                     </p>
-                    <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
-                      <Bot className="w-4 h-4" />
-                      <span>Powered by {selectedAgent.llm_model}</span>
-                    </div>
                   </div>
                 </div>
               ) : (
@@ -759,15 +749,14 @@ export function ChatPage({}: ChatPageProps) {
           </div>
         ) : (
           <div className="flex-1 flex items-center justify-center">
-            <div className="text-center max-w-md">
-              <Bot className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-              <h3 className="text-xl font-semibold mb-3">
-                No Agents Available
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                Create an agent to start chatting. Visit the Agents page to get
-                started.
+            <div className="text-center">
+              <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+              <p className="text-muted-foreground text-sm mb-4">
+                No agents available
               </p>
+              <Button onClick={() => navigate("/app/agents")} variant="outline" size="sm">
+                Create an agent
+              </Button>
             </div>
           </div>
         )}

@@ -50,7 +50,10 @@ export function UsageGraphWidget() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [metricType, setMetricType] = useState<MetricType>("invocations");
-  const [dateRange, setDateRange] = useState<number>(7); // days
+  const [dateRange, setDateRange] = useState<number>(() => {
+    const saved = localStorage.getItem("usageGraphDateRange");
+    return saved ? Number(saved) : 7;
+  });
 
   useEffect(() => {
     loadUsageData();
@@ -253,7 +256,11 @@ export function UsageGraphWidget() {
             </Select>
             <Select
               value={dateRange.toString()}
-              onValueChange={(value) => setDateRange(Number(value))}
+              onValueChange={(value) => {
+                const numValue = Number(value);
+                setDateRange(numValue);
+                localStorage.setItem("usageGraphDateRange", value);
+              }}
             >
               <SelectTrigger className="w-24">
                 <SelectValue />
@@ -271,19 +278,25 @@ export function UsageGraphWidget() {
         {/* Summary Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 min-w-0">
           <div className="p-3 rounded-lg bg-muted/50">
-            <p className="text-xs text-muted-foreground">Total Invocations</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+              Invocations
+            </p>
             <p className="text-lg font-semibold">
               {usageData.total_usage.invocation_count.toLocaleString()}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-muted/50">
-            <p className="text-xs text-muted-foreground">Total Tokens</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+              Tokens
+            </p>
             <p className="text-lg font-semibold">
               {usageData.total_usage.total_tokens.toLocaleString()}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-muted/50">
-            <p className="text-xs text-muted-foreground">Top Agent</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+              Top Agent
+            </p>
             <p className="text-lg font-semibold truncate">
               {usageData.top_agents && usageData.top_agents.length > 0
                 ? usageData.top_agents[0].agent_name
@@ -291,7 +304,9 @@ export function UsageGraphWidget() {
             </p>
           </div>
           <div className="p-3 rounded-lg bg-muted/50">
-            <p className="text-xs text-muted-foreground">Top Model</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+              Top Model
+            </p>
             <p className="text-lg font-semibold truncate">
               {usageData.top_agents && usageData.top_agents.length > 0
                 ? usageData.top_agents[0].model
